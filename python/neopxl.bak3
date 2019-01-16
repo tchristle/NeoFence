@@ -1,0 +1,306 @@
+import socket
+import os
+import time
+import code
+
+## apply pixel addresses to fence columns
+def addr2col():
+    col[0]=range(300,354+1)    
+    col[1]=range(417,363+1,-1)
+    col[2]=range(426,479+1)
+    col[3]=range(544,490,-1)
+    col[4]=range(553,609)
+    col[5]=range(674,620,-1)
+    col[6]=range(682,735)
+    col[7]=range(801,746,-1)
+    col[8]=range(808,863)
+    col[9]=range(925,872,-1)
+    col[10]=range(934,988)
+    col[11]=range(1050,997,-1)
+    col[12]=range(1060,1114)
+    col[13]=range(1176,1124,-1)
+    col[14]=range(1186,1239)
+    col[15]=range(1304,1250,-1)
+    col[16]=range(1316,1367)
+    col[17]=range(1427,1377,-1)
+    col[18]=range(1440,1493)
+    col[19]=range(1551,1501,-1)
+    col[20]=range(1564,1616)
+    col[21]=range(1676,1625,-1)
+    col[22]=range(1687,1740)
+    col[23]=range(1804,1751,-1)
+    col[24]=range(1816,1866)
+    col[25]=range(1928,1876,-1)
+    col[26]=range(1938,1993)
+    col[27]=range(2056,2004,-1)
+    col[28]=range(2065,2090)+range(300,274,-1)
+    col[29]=range(211,264)
+
+## Display fence matrix 
+def show():
+    #s2f(f2ba())
+    #showtop()
+    fba=bytearray(300*len(sf)*3)
+    # fence bars
+    for x in range(w):
+        for y in range(49):  #(h):
+	    #print x, y
+	    fba[col[x][y]*3+0]=npr[fence[x][y]][0] #R
+	    fba[col[x][y]*3+1]=npr[fence[x][y]][1] #G
+	    fba[col[x][y]*3+2]=npr[fence[x][y]][2] #B
+    # fence top
+    for p in range(len(top)):
+        fba[p*3+0]=npr[top[p]][0]#R
+        fba[p*3+1]=npr[top[p]][1]#G
+        fba[p*3+2]=npr[top[p]][2]#B
+    # fence bottom
+    offset = 300*3*7
+    for p in range(len(btm)):
+        fba[p*3+0+offset]=npr[btm[p]][0]#R
+        fba[p*3+1+offset]=npr[btm[p]][1]#G
+        fba[p*3+2+offset]=npr[btm[p]][2]#B
+    # fence wifi
+    x=0
+    for i in sf:
+        a=s.sendto(fba[900*x:900*(x+1)], (i, UDP_PORT))
+        x=x+1
+
+
+#### send byte array to all fence strips
+#### to populate fence with color array: s2f(f2ba())
+##def s2f(sba):
+##    x=0
+##    for i in sf:
+##        a=s.sendto(sba[900*x:900*(x+1)], (i, UDP_PORT))
+##        x=x+1
+##    
+#### create bytearray from populated fence[] array
+##def f2ba():
+##    fba=bytearray(300*len(sf)*3)
+##    for x in range(w):
+##	for y in range(49):  #(h):
+##	    #print x, y
+##	    fba[col[x][y]*3+0]=npr[fence[x][y]][0] #R
+##	    fba[col[x][y]*3+1]=npr[fence[x][y]][1] #G
+##	    fba[col[x][y]*3+2]=npr[fence[x][y]][2] #B
+##    return fba
+
+#### strip to byte array
+##def st2ba(strp):
+##    ba=bytearray()
+##    for i in range(len(strp)):
+##        ba.append(npr[strp[i]][0])
+##        ba.append(npr[strp[i]][1])
+##        ba.append(npr[strp[i]][2])
+##    return ba
+##
+#### show top and bottom strip patterns
+##def showtb():
+##    tba=bytearray(len(top)*3)
+##    for p in range(len(top)):
+##        tba[p*3+0]=npr[top[p]][0]#R
+##        tba[p*3+1]=npr[top[p]][1]#G
+##        tba[p*3+2]=npr[top[p]][2]#B
+##    a=s.sendto(tba, (sf[0], UDP_PORT)) 
+##    tba=bytearray(len(btm)*3)
+##    for p in range(len(btm)):
+##        tba[p*3+0]=npr[btm[p]][0]#R
+##        tba[p*3+1]=npr[btm[p]][1]#G
+##        tba[p*3+2]=npr[btm[p]][2]#B
+##    a=s.sendto(tba, (sf[-1], UDP_PORT))
+
+def rotL(arr):
+    arr=arr[-3:]+arr[:-3]
+    return arr
+
+def rotR(arr):
+    arr=arr[3:]+arr[0:3]
+    return arr
+
+## set single pixel on by address
+def poke(addr):
+	ba=bytearray(len(sf)*3*300)
+	ba[addr*3:(addr*3+2)]=(128,128,128)
+	s2f(ba)
+
+## get data from single pixel by address
+def peek(addr):
+	pass
+
+## apply single to entire fence
+def scfence(c):
+    for x in range(0,h):
+        for y in range (0,w):
+            fence[y][x]=c
+    #s2f(f2ba())
+    show()
+    return 0
+
+## turn off all
+def off():
+    s2f(bytearray(len(sf)*300*3))    
+
+## set fence array to zeros
+def fclr():
+    scfence(0)
+
+## set all pixels white
+def fwht():
+	scfence(len(npr)-1)
+
+## apply color to single fence bar
+def colbar(x,c):
+    for i in range(0,h):
+        fence[x][i]=c
+        
+## apply color to single row across all bars
+def colrow(y,c):
+    for i in range(0,w):
+        fence[i][y]=c
+
+## apply color to single pixel
+def colpix(x,y,c):
+    fence[x][y]=c
+
+## draw rectangle
+def rect(x,y,l,h,c):
+	for i in range(x,x+l):
+		fence[i][y]=c #top
+		fence[i][y+h]=c #bottom
+	for i in range(y,y+h):
+		fence[x][i]=c #left
+		fence[x+l][i]=c #right
+
+## cycle rainbow patter across bars left ot  right
+def ranbar(y,a,b,s):
+    c=0
+    while 1:
+        for x in range(0,30):
+            colbar(x,c)
+            show()
+            time.sleep(s)
+            c=c+y
+            if c>b:
+                c=a
+
+## purple rain
+def pprn():                 
+    while 1:
+        for i in range(49):
+            colrow(i,200)
+            show()
+            time.sleep(0.04)
+            fclr()
+
+def boxxy(s):
+    c=0
+    y=0
+    while 1:
+        for m in range(w):
+            for n in range(h):
+                c=(abs(n-15)+abs(m-26))+y
+                if c>383:
+                    c=c-383
+                if c>383:
+                    c=c-383
+                y=y+1
+                if y==380:
+                    y=0
+                fence[m][n]=c
+                #print c
+        show()
+        time.sleep(s)
+
+def rainbow_fence():
+    c=0
+    for i in range(0,len(fence)):
+        for j in range(0,len(fence[i])):
+            fence[i][j]=c
+            c=c+1
+            if c == 384:
+                c=0
+
+## ping all strips
+def ping():
+    summary = 'summary: \r\n'
+    for p in sf:
+        resp = os.system('ping -c 1 ' + p)
+        if resp==0:
+            summary = summary + p + ' - ok\r\n'
+        else:
+            summary = summary + p + ' - offline\r\n'
+    print summary
+
+###---------------------------------------------------------------------###    
+
+## define neopixel network setup
+UDP_PORT = 5006
+s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+sf=[]
+sf.append('192.168.1.30')
+sf.append('192.168.1.32')
+sf.append('192.168.1.34')
+sf.append('192.168.1.31')
+sf.append('192.168.1.33')
+sf.append('192.168.1.35')
+sf.append('192.168.1.39')
+sf.append('192.168.1.14')
+test='192.168.1.14'
+
+## define rainbow to color array
+npr=[]
+r=g=b= 0
+for x in range(128):
+    r=128-x
+    g=x
+    b=0
+    npr.append((r,g,b))
+for x in range(128):
+    r=0
+    g=128-x
+    b=x
+    npr.append((r,g,b))    
+for x in range(128):
+    r=x
+    g=0
+    b=128-x
+    npr.append((r,g,b))
+npr[0]=((0,0,0))
+npr.append((128,128,128))
+#npr.append((0,0,0))
+
+npr2=[]
+for x in npr:
+    r=int(x[0]*0.5)
+    g=int(x[1]*0.5)
+    b=int(x[2]*0.5)
+    npr2.append((r,g,b))
+    
+red=128
+orange = 127
+green = 1
+yellow = 383
+blue = 256
+indigo = 639
+
+## define fence array with w=columns and h=pixels
+## any value applied is a color from npr[], npr[-1] is off and npr[-2] is white
+w, h = 30, 56
+fence = [[0 for x in range(h)] for y in range(w)]
+## define pixel addresses for each column. top to bottom
+col=[[0 for x in range(h)] for y in range(w)]
+## apply column adresses
+addr2col()
+## define top strip
+top=range(205)
+#top=[0]*205
+## define bottom strip
+btm=range(205)
+btm=[0]*205
+
+#fba=bytearray(900*8)
+off()
+fclr()
+x=0
+y=0
+c=0

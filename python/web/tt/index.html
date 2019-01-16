@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Color Control</title>
+    <meta name="theme-color" content="#00878f">
+    <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport'>
+</head>
+
+<body>
+    <center>
+        <header>
+            <h1>Color Control</h1>
+        </header>
+        <div>
+            <table>
+                <tr>
+                    <td style="width:14.4px; text-align: right">R: </td>
+                    <td><input class="enabled" id="r" type="range" min="0" max="384" step="1" oninput="sendRGB();" value="128"></td>
+                </tr>
+            </table>
+            <p style="margin:8px 0px"><button id="stopT" class="button" style="background-color:#999" onclick="stopTT();">stop</button></p>
+        </div>
+    </center>
+</body>
+    <script language="javascript" type="text/javascript">
+	
+	var stopTuTa = false;
+	var connection = new WebSocket('ws://'+location.hostname+':8080/ws');
+	
+	connection.onopen = function () {
+	connection.send('Connect ' + new Date());
+	};
+	connection.onerror = function (error) {
+		console.log('WebSocket Error ', error);
+	};
+	connection.onmessage = function (e) {  
+		console.log('Server: ', e.data);
+	};
+	connection.onclose = function(){
+		console.log('WebSocket connection closed');
+	};
+
+	function sendRGB() {
+		var r = document.getElementById('r').value;//**2/1023;
+		var rstr = '#'+ r.toString(16);    
+		console.log('R: ' + rstr); 
+		connection.send(rstr);
+	}
+
+	function stopTT(){
+		stopTuTa = ! stopTuTa;
+		if(stopTuTa){
+			connection.send("#768");
+			document.getElementById('stopT').style.backgroundColor = '#00878F';
+			document.getElementById('r').className = 'disabled';
+			document.getElementById('r').disabled = true;
+		} else {
+			//connection.send("N");
+			document.getElementById('stopT').style.backgroundColor = '#999';
+			document.getElementById('r').className = 'enabled';
+			document.getElementById('r').disabled = false;
+			sendRGB();
+		}  
+	}	
+	</script>
+</html>
