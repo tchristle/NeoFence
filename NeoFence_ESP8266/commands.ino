@@ -25,7 +25,6 @@ void command_lookup(String str)
   //else if (str == "ss") { start_servo(); }
   else if (str.substring(0,3) == "con") { con(); }
   else if (str.substring(0,2) == "cp") { cp(str.substring(3)); }
-  else if (str == "web") { web_setup(); web();}
   //    ESP    ////////////////////////////////////////////////////////////////////////////////////////////////////
   else if (str.substring(0,3) == "rst") { rst(); }
   //    EEPROM    /////////////////////////////////////////////////////////////////////////////////////////////////
