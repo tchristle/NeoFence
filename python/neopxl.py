@@ -340,6 +340,16 @@ def fi2mm(fname):
 	mm.write(f.readline())
 	f.close()
 	return None
+
+## get message from webserver
+def ws_message(ctrl, val):
+        if ctrl == 1:
+                scfence(val)
+                show()
+        if ctrl == 2:
+                pass
+        
+        return None
 	
 ## print fence array as ASCII pattern
 def fen2ascii():
