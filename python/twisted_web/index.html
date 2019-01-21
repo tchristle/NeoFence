@@ -1,17 +1,117 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<style>
-		
-	</style>
+    <title>Control</title>
+    <meta name="theme-color" content="#00878f">
+    <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport'>
 </head>
-<body>
-	<center>
-    <form class="foo">
-		<font size="6">Click <a href="http://www.bitbros.org:8080/tt">here</a> to go to test1.
-    </form>
-    <div id="output"></div>
-	</center>
-</body>
-</html>
 
+<body>
+    <center>
+        <header>
+            <h1>Control</h1>
+        </header>
+        <div>
+            <table>
+                <tr>
+                    <td style="width:14.4px; text-align: right">1: </td>
+                    <td><input class="enabled" id="r1" type="range" min="0" max="384" step="1" oninput="sendSLD1();" value="128"></td>
+					<td><button id="stopT" class="button" style="background-color:#999" onclick="stopTT();">1</button></td>
+                </tr>
+				<tr>
+                    <td style="width:14.4px; text-align: right">2: </td>
+                    <td><input class="enabled" id="r2" type="range" min="0" max="384" step="1" oninput="sendSLD2();" value="128"></td>
+                </tr>
+				<tr>
+                    <td style="width:14.4px; text-align: right">3: </td>
+                    <td><input class="enabled" id="r3" type="range" min="0" max="384" step="1" oninput="sendSLD3();" value="128"></td>
+                </tr>
+				<tr>
+                    <td style="width:14.4px; text-align: right">4: </td>
+                    <td><input class="enabled" id="r4" type="range" min="0" max="384" step="1" oninput="sendSLD4();" value="128"></td>
+                </tr>
+				<tr>
+                    <td style="width:14.4px; text-align: right">5: </td>
+                    <td><input class="enabled" id="r5" type="range" min="0" max="384" step="1" oninput="sendSLD5();" value="128"></td>
+                </tr>
+				<tr>
+                    <td style="width:14.4px; text-align: right">6: </td>
+                    <td><input class="enabled" id="r6" type="range" min="0" max="384" step="1" oninput="sendSLD6();" value="128"></td>
+					<td><button id="stopT" class="button" style="background-color:#999" onclick="stopTT();">6</button></td>
+                </tr>				
+            </table>
+            <p style="margin:8px 0px"></p>
+        </div>
+    </center>
+</body>
+    <script language="javascript" type="text/javascript">
+	
+	var stopTuTa = false;
+	var connection = new WebSocket('ws://'+location.hostname+':8081/ws');
+	
+	connection.onopen = function () {
+	connection.send('Connect ' + new Date());
+	};
+	connection.onerror = function (error) {
+		console.log('WebSocket Error ', error);
+	};
+	connection.onmessage = function (e) {  
+		console.log('Server: ', e.data);
+	};
+	connection.onclose = function(){
+		console.log('WebSocket connection closed');
+	};
+
+	function sendSLD1() {
+		var r1 = document.getElementById('r1').value;
+		var rstr = '#1#'+ r1.toString(16);    
+		console.log('R: ' + rstr); 
+		connection.send(rstr);
+	}
+	function sendSLD2() {
+		var r2 = document.getElementById('r2').value;
+		var rstr = '#2#'+ r2.toString(16);    
+		console.log('R: ' + rstr); 
+		connection.send(rstr);
+	}
+	function sendSLD3() {
+		var r3 = document.getElementById('r3').value;
+		var rstr = '#3#'+ r3.toString(16);    
+		console.log('R: ' + rstr); 
+		connection.send(rstr);
+	}
+	function sendSLD4() {
+		var r4 = document.getElementById('r4').value;
+		var rstr = '#4#'+ r4.toString(16);    
+		console.log('R: ' + rstr); 
+		connection.send(rstr);
+	}
+	function sendSLD5() {
+		var r5 = document.getElementById('r5').value;
+		var rstr = '#5#'+ r5.toString(16);    
+		console.log('R: ' + rstr); 
+		connection.send(rstr);
+	}
+	function sendSLD6() {
+		var r6 = document.getElementById('r6').value;
+		var rstr = '#6#'+ r6.toString(16);    
+		console.log('R: ' + rstr); 
+		connection.send(rstr);
+	}
+	function stopTT(){
+		stopTuTa = ! stopTuTa;
+		if(stopTuTa){
+			connection.send("#768");
+			document.getElementById('stopT').style.backgroundColor = '#00878F';
+			document.getElementById('r').className = 'disabled';
+			document.getElementById('r').disabled = true;
+		} else {
+			//connection.send("N");
+			document.getElementById('stopT').style.backgroundColor = '#999';
+			document.getElementById('r').className = 'enabled';
+			document.getElementById('r').disabled = false;
+			sendRGB6();
+		}  
+	}	
+	</script>
+</html>
