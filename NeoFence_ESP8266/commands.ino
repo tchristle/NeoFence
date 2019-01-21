@@ -11,7 +11,6 @@ void command_lookup(String str)
   else if (str == "gudp") { get_udp(); }
   else if (str == "ip") { get_ip(); }
   else if (str == "id") { get_id(); }
-  else if (str == "sw") { stop_watch(); }
   else if (str == "cs") { check_server(); }
   else if (str == "rssi") { rssi(); }
   else if (str == "stanum") { get_STAnum(); }
@@ -20,9 +19,6 @@ void command_lookup(String str)
   //    TCP    ////////////////////////////////////////////////////////////////////////////////////////////////////
   else if (str.substring(0,2) == "sp") { sp(rcvstr.substring(2)); }
   //else if (str == "tel") {telnet_setup(); }
-  else if (str == "ping") { ping(); }
-  else if (str == "pong") { pong(); }
-  //else if (str == "ss") { start_servo(); }
   else if (str.substring(0,3) == "con") { con(); }
   else if (str.substring(0,2) == "cp") { cp(str.substring(3)); }
   //    ESP    ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -42,11 +38,6 @@ void command_lookup(String str)
   //    NEOPIXEL    ////////////////////////////////////////////////////////////////////////////////////////////////
   else if (str == "ssw") { set_strip_white(); }
   else if (str == "udp2np") { udp2neopixel(); }
-  else if (str == "sled1") { sled(1); }
-  else if (str == "sled0") { sled(0); }
-  else if (str == "sw1") { sw(1); }
-  else if (str == "sw0") { sw(0); }
-  //
   else if (str == "") { Serial.println(); }       
   else if (str != "") { Serial.println(rcvstr); Serial.println("Invalid"); rcvstr = ""; }
 }
@@ -56,7 +47,25 @@ void test()
   Serial.println("\ntest ok");
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+void check_uart(){
+  if (Serial.available ())
+  {
+    incomingByte = Serial.read();
+    rcvstr += incomingByte;
+    if (incomingByte==127 && rcvstr.length()>1) rcvstr = rcvstr.substring(0,rcvstr.length()-2);
+    if (incomingByte != 13 || incomingByte != 10) Serial.print(incomingByte);
+    if (incomingByte == 27) {rcvstr = last_rcvstr; Serial.print(rcvstr); }
+    if (incomingByte == 13 || incomingByte == 10)
+      {
+        rcvstr.trim(); 
+        Serial.println();
+        command_lookup(rcvstr); 
+        Serial.print("ESP:>");
+        last_rcvstr = rcvstr;
+        rcvstr = "";
+      }
+  }
+}
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void rst(){
   ESP.restart();
@@ -83,17 +92,6 @@ void get_STAnum(){
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void get_ver(){
   Serial.println(sw_ver);
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void stop_watch(){
-  int waiting;
-  while(Serial.available()<1){ }
-  Serial.read();
-  waiting = millis();
-  while(Serial.available()<1){ }
-  waiting = millis() - waiting;
-  Serial.println(waiting);
-  Serial.read();
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //NEOPIXEL//
@@ -184,13 +182,3 @@ int udp2neopixel() {
 }
 
 */
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void sled(int state){
-  digitalWrite(13, state);
-}
-//
-void sw(int state){
-  digitalWrite(12, state);
-}
-

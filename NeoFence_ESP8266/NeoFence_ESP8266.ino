@@ -23,14 +23,11 @@ const char* help = "? this menu \n\r"
   "c2t connect telnet \n\r"
   "ip get ip \n\r"
   "id get id \n\r"
-  "sw stop watch \n\r"
   "cs check_server \n\r"
   "rssi get rssi \n\r"
   "stanum get_STAnum \n\r"
   "// TCP ////////////////////////////////////////////////////////// \n\r"
   "sp - server print \n\r"
-  "ping ping() \n\r"
-  "pong pong() \n\r"
   "con connect \n\r"
   "cp - client print \n\r"
   "// ESP ////////////////////////////////////////////////////////// \n\r"
@@ -46,8 +43,8 @@ const char* help = "? this menu \n\r"
   "setSTRT - startup function \n\r"
   "ver - version \n\r";
 
-const char* ssid = "NETGEAR11";
-const char* password = "niftypotato037";
+const char* ssid = "ssid";
+const char* password = "password";
 char* host = "192.168.4.1";
 String rIP = "192.168.1.1";
 String node_id_c;
